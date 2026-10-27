@@ -1,0 +1,240 @@
+========================= 基于多元参数时序预测的岩爆预警方法研究_谢泓博
+目录: 未找到
+传统统计/ML: 42 | ARIMA,指数平滑,XGBoost,随机森林,支持向量机,SVM,孤立森林,K-Means
+经典DL: 206 | LSTM,GRU,RNN,CNN,自编码器,Autoencoder,GAN
+Transformer: 3 | Transformer,注意力机制
+LLM: 3 | GPT,BERT,语义
+TSFM: 3 | 基础模型,预训练
+
+========================= 基于多元时序流数据的可进化无监督异常检测与根因分析方法研究_司展宇
+章节: 
+小节: 
+传统统计/ML: 16 | ARIMA,支持向量机,LOF,孤立森林,DBSCAN,马尔可夫,因果
+经典DL: 100 | LSTM,RNN,TCN,自编码器,Autoencoder,VAE,GAN,MLP
+Transformer: 0 | 
+LLM: 0 | 
+TSFM: 3 | 预训练
+
+========================= 基于大模型输入表示优化的时间序列预测方法研究_杨俊杰
+目录: 未找到
+传统统计/ML: 9 | ARIMA,随机森林,VAR,因果
+经典DL: 75 | LSTM,GRU,RNN,CNN,TCN,Diffusion,GNN,图卷积,GCN,GAT
+Transformer: 91 | Transformer,Informer,Autoformer,FEDformer,PatchTST,TimesNet,DLinear,注意力机制,Attention
+LLM: 368 | 大语言模型,大模型,LLM,GPT,Time-LLM,提示,Prompt,语义
+TSFM: 55 | 基础模型,预训练,Chronos,UniTS,零样本,少样本,zero-shot,few-shot
+
+========================= 基于大语言模型的时间序列异常检测模型研究_何奇超
+章节: 
+小节: 
+传统统计/ML: 26 | ARIMA,EWMA,STL,支持向量机,SVM,LOF,孤立森林,DBSCAN,3-Sigma,IQR,马尔可夫
+经典DL: 196 | LSTM,GRU,RNN,CNN,自编码器,Autoencoder,VAE,GAN,扩散模型,Diffusion,GNN,状态空间
+Transformer: 50 | Transformer,Informer,FEDformer,注意力机制,Attention
+LLM: 312 | 大语言模型,大模型,LLM,GPT,Llama,提示,Prompt,LoRA,语义
+TSFM: 22 | 基础模型,预训练,Timer,零样本,zero-shot,few-shot
+
+========================= 基于时序基础TimesNet模型的配网负荷短期预测_周通
+目录: 未找到
+传统统计/ML: 1 | 随机森林
+经典DL: 13 | LSTM,GRU,CNN,TCN,图卷积
+Transformer: 23 | TimesNet,注意力机制
+LLM: 0 | 
+TSFM: 0 | 
+
+========================= 基于时序基础模型的心电信号预测方法的研究_薛婷婷
+目录: 未找到
+传统统计/ML: 26 | ARIMA,指数平滑,XGBoost,LightGBM,随机森林,支持向量机,SVM,卡尔曼,因果
+经典DL: 81 | LSTM,GRU,RNN,CNN,TCN,自编码器,Autoencoder,GAN,MLP,状态空间
+Transformer: 107 | Transformer,Informer,Autoformer,FEDformer,PatchTST,TFT,注意力机制,Attention
+LLM: 61 | 大语言模型,大模型,LLM,GPT,Llama,BERT,T5,Time-LLM,语义
+TSFM: 121 | 时序基础模型,基础模型,预训练,TimesFM,Chronos,TimeGPT,Timer,零样本,few-shot
+
+========================= 基于时序数据的公交车速预测及异常检测方法研究_肖宇
+章节: 
+小节: 
+传统统计/ML: 266 | ARIMA,STL,XGBoost,随机森林,支持向量机,SVM,LOF,孤立森林,DBSCAN,卡尔曼,VAR,马尔可夫
+经典DL: 61 | LSTM,RNN,CNN,自编码器,VAE,图卷积
+Transformer: 10 | 注意力机制,Attention
+LLM: 1 | 语义
+TSFM: 0 | 
+
+========================= 基于时序模式的城轨系统牵引能耗预测和异常检测方法_姬之慧
+目录: 未找到
+传统统计/ML: 62 | ARIMA,SARIMA,Prophet,STL,SVM,IQR
+经典DL: 99 | LSTM,GRU,RNN,CNN,TCN,GAN,GNN,GAT
+Transformer: 92 | Transformer,iTransformer,TFT,注意力机制,Attention
+LLM: 0 | 
+TSFM: 0 | 
+
+========================= 基于时序点过程与大语言模型结合的事件序列异常检测方法研究_庄秦明
+章节: 
+小节: 
+传统统计/ML: 153 | 支持向量机,SVM,Hawkes,时间点过程,马尔可夫,causal
+经典DL: 55 | LSTM,RNN,CNN,自编码器,VAE,GAN,扩散模型
+Transformer: 28 | Transformer,注意力机制,Attention
+LLM: 580 | 大语言模型,大模型,LLM,GPT,Time-LLM,提示,Prompt,LoRA,语义
+TSFM: 32 | 基础模型,预训练,Chronos,零样本,少样本,zero-shot
+
+========================= 基于时序特征的装配异常检测和电力价格预测研究_张栋
+目录: 未找到
+传统统计/ML: 138 | ARIMA,指数平滑,Prophet,XGBoost,随机森林,支持向量机,SVM,孤立森林,K-Means,DBSCAN,GARCH,因果
+经典DL: 173 | LSTM,GRU,RNN,CNN,TCN,自编码器,MLP
+Transformer: 88 | Transformer,Informer,注意力机制,Attention
+LLM: 2 | 提示,语义
+TSFM: 0 | 
+
+========================= 基于时序预测和异常检测的容器云主动式调度技术研究_李宗霖
+章节: 
+小节: 
+传统统计/ML: 9 | ARIMA,XGBoost,LOF,DBSCAN
+经典DL: 21 | LSTM,CNN,自编码器,VAE,GAN
+Transformer: 47 | Transformer,Informer,Autoformer,注意力机制,Attention
+LLM: 333 | 大语言模型,大模型,LLM,GPT,Llama,BERT,RoBERTa,T5,提示,Prompt,语义
+TSFM: 65 | 基础模型,预训练,零样本,少样本,zero-shot,few-shot
+
+========================= 基于时空依赖的多元时序数据异常检测和根因分析研究_李培
+目录: 未找到
+传统统计/ML: 135 | 支持向量机,SVM,LOF,孤立森林,K-Means,马尔可夫,causal,因果
+经典DL: 619 | LSTM,GRU,RNN,CNN,TCN,自编码器,Autoencoder,VAE,GAN,GNN,图卷积,GCN,GAT,MLP
+Transformer: 69 | Transformer,TimesNet,注意力机制,Attention
+LLM: 1 | 大语言模型
+TSFM: 0 | 
+
+========================= 基于机器学习的牵引电机异常检测方法研究_李明阳
+章节: 
+小节: 
+传统统计/ML: 191 | ARIMA,SARIMA,指数平滑,随机森林,支持向量机,SVM,LOF,孤立森林,DBSCAN,VAR
+经典DL: 267 | LSTM,GRU,RNN,CNN,自编码器,VAE,图卷积,GAT
+Transformer: 30 | 注意力机制,Attention
+LLM: 6 | 提示,语义
+TSFM: 1 | 预训练
+
+========================= 基于混合模型的股价异常检测与时序预测_董泽帆
+章节: 
+小节: 
+传统统计/ML: 161 | ARIMA,SARIMA,Prophet,XGBoost,LightGBM,随机森林,支持向量机,SVM,GARCH,马尔可夫,因果
+经典DL: 154 | LSTM,GRU,RNN,CNN,自编码器,Autoencoder,GAN,GNN,MLP
+Transformer: 16 | Transformer,PatchTST,TimesNet,注意力机制
+LLM: 0 | 
+TSFM: 2 | 基础模型
+
+========================= 基于物联网与时序大语言模型的科研仪器电流异常检测与故障诊断系统研究_刘岩
+目录: 未找到
+传统统计/ML: 27 | ARIMA,XGBoost,LOF,孤立森林,K-Means
+经典DL: 15 | LSTM,RNN,CNN,GAN
+Transformer: 14 | Transformer,注意力机制
+LLM: 201 | 大语言模型,大模型,LLM,GPT,Llama,BERT,Time-LLM,Qwen,提示,Prompt,语义
+TSFM: 8 | 预训练,少样本
+
+========================= 基于编码器-预测器架构的多维时间序列异常检测方法_陈敬一
+目录: 未找到
+传统统计/ML: 49 | LOF,IQR,因果
+经典DL: 76 | LSTM,GRU,CNN,TCN,自编码器,VAE,GAN,GAT,状态空间
+Transformer: 103 | Transformer,Informer,Autoformer,iTransformer,TimesNet,DLinear,注意力机制
+LLM: 0 | 
+TSFM: 0 | 
+
+========================= 基于边缘计算的车联网服务故障检测与根因分析_李屹山
+章节: 
+小节: 
+传统统计/ML: 21 | ARIMA,支持向量机,SVM,K-Means,DBSCAN,VAR,马尔可夫,因果
+经典DL: 83 | LSTM,GRU,RNN,CNN,自编码器,Autoencoder,VAE,GAN,图卷积,GCN,GAT,MLP
+Transformer: 43 | Transformer,TimesNet,注意力机制,Attention
+LLM: 1 | Prompt
+TSFM: 0 | 
+
+========================= 基于面向微服务系统的异常检测与根因分析研究应用_张雪
+目录: 未找到
+传统统计/ML: 190 | causal,因果
+经典DL: 147 | LSTM,GRU,RNN,CNN,TCN,GAN,GNN,图卷积,GCN,GAT
+Transformer: 162 | Transformer,注意力机制,Attention,BGMformer
+LLM: 40 | GPT,BERT,T5,语义
+TSFM: 3 | 预训练,少样本
+
+========================= 基于预训练大语言模型的时序概念漂移分类研究_邓钊
+章节: 
+小节: 
+传统统计/ML: 17 | ARIMA,EWMA,XGBoost,LightGBM,支持向量机,SVM,因果
+经典DL: 55 | LSTM,GRU,RNN,CNN,TCN,MLP
+Transformer: 32 | Transformer,Informer,PatchTST,注意力机制,Attention
+LLM: 212 | 大语言模型,LLM,GPT,BERT,T5,Time-LLM,Qwen,提示,语义
+TSFM: 52 | 基础模型,预训练,少样本,zero-shot,few-shot
+
+========================= 基于预训练时序基础模型的极端天气海上风电功率预测_李少锋
+目录: 未找到
+传统统计/ML: 13 | ARIMA,随机森林,支持向量机,SVM,GARCH,因果
+经典DL: 24 | LSTM,GRU,RNN,CNN,TCN,自编码器,GAN
+Transformer: 61 | Transformer,Informer,Autoformer,FEDformer,PatchTST,TimesNet,DLinear
+LLM: 32 | 大语言模型,大模型,GPT,Llama
+TSFM: 95 | 时序基础模型,基础模型,预训练,TimesFM,Chronos,Moirai,TimeGPT,零样本,少样本,zero-shot
+
+========================= 基于频域特征与预测分析的智能运维时序异常检测算法研究_揭海亮
+章节: 
+小节: 
+传统统计/ML: 27 | ARIMA,SARIMA,LOF,孤立森林,马尔可夫,因果
+经典DL: 107 | LSTM,RNN,CNN,自编码器,Autoencoder,VAE,GAN,扩散模型,Diffusion,MLP,Mamba
+Transformer: 43 | Transformer,Informer,TimesNet,注意力机制,Attention
+LLM: 3 | 大模型,Qwen,提示
+TSFM: 1 | 基础模型
+
+========================= 大语言模型驱动的桥梁结构监测时序数据分析方法研究_申靖源
+章节: 
+小节: 
+传统统计/ML: 25 | causal,因果
+经典DL: 37 | LSTM,GRU,RNN,CNN,GNN,图卷积,GCN,MLP
+Transformer: 117 | Transformer,Informer,Autoformer,PatchTST,TimesNet,DLinear,注意力机制,Attention
+LLM: 285 | 大语言模型,大模型,LLM,GPT,Llama,Time-LLM,提示,Prompt,语义
+TSFM: 31 | 时序基础模型,基础模型,预训练,MOMENT,Chronos,Timer,零样本,少样本,zero-shot
+
+========================= 考虑早期充电特性的锂电池循环寿命预测方法研究_崔欣茹
+章节: 
+小节: 
+传统统计/ML: 19 | 支持向量机,SVM,卡尔曼,GARCH,VAR,因果
+经典DL: 71 | LSTM,GRU,RNN,CNN,TCN,GNN
+Transformer: 22 | 注意力机制,Attention
+LLM: 0 | 
+TSFM: 6 | 基础模型
+
+========================= 面向工业控制系统的时序数据异常检测方法研究_马金泽
+章节: 
+小节: 
+传统统计/ML: 48 | ARIMA,随机森林,支持向量机,SVM,LOF,孤立森林,VAR
+经典DL: 212 | LSTM,GRU,RNN,CNN,TCN,自编码器,Autoencoder,VAE,GAN,图卷积,GAT,状态空间
+Transformer: 76 | Transformer,Informer,Autoformer,注意力机制,Attention
+LLM: 3 | BERT,提示,语义
+TSFM: 2 | 预训练
+
+========================= 面向时序数据的预训练模型研究_梁洪铭
+章节: 
+小节: 
+传统统计/ML: 12 | ARIMA,XGBoost,SVM,GARCH
+经典DL: 152 | LSTM,GRU,RNN,CNN,TCN,GNN,MLP,Mamba,状态空间,SSM
+Transformer: 98 | Transformer,Informer,Autoformer,FEDformer,TimesNet,Attention
+LLM: 35 | LLM,GPT,Llama,BERT,T5,Prompt
+TSFM: 38 | 预训练,MOMENT,Chronos,Moirai,TimeGPT,Timer,zero-shot,few-shot
+
+========================= 面向时序预测的注意力机制优化方法_张智成
+章节: 
+小节: 
+传统统计/ML: 7 | ARIMA,VAR,马尔可夫,causal,因果
+经典DL: 59 | LSTM,GRU,RNN,CNN,自编码器,GAN,MLP,Mamba,状态空间,SSM
+Transformer: 460 | Transformer,Informer,Autoformer,FEDformer,PatchTST,iTransformer,TimesNet,DLinear,注意力机制,Attention,Monarchformer
+LLM: 11 | 大语言模型,大模型,LLM,Llama,BERT,Time-LLM,提示,语义
+TSFM: 3 | 基础模型,零样本
+
+========================= 面向给排水监控的时频融合异常检测方法研究_安兴
+章节: 
+小节: 
+传统统计/ML: 24 | ARIMA,Prophet,支持向量机,SVM,LOF,K-Means,causal,因果
+经典DL: 129 | LSTM,GRU,RNN,CNN,TCN,自编码器,Autoencoder,GAN,GNN,图卷积,GCN,GAT
+Transformer: 22 | Transformer,注意力机制,Attention
+LLM: 26 | 语义
+TSFM: 0 | 
+
+========================= 面向长期序列预测的时间依赖表征方法研究_郑呈东
+目录: 未找到
+传统统计/ML: 6 | 指数平滑,随机森林,因果
+经典DL: 0 | 
+Transformer: 54 | 注意力机制
+LLM: 27 | 大语言模型,语义
+TSFM: 0 | 
+

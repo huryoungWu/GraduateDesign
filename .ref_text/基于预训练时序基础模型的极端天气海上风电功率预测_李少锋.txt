@@ -1,0 +1,1019 @@
+第 52 卷 第 7 期：3086-3097 2026 年 7 月 31 日 DOI: 10.13336/j.1003-6520.hve.20260355
+
+高电压技术 High Voltage Engineering
+
+Vol.52, No.7: 3086-3097 July 31, 2026
+2026 年 7 月 31 日第 52 卷 July
+
+基于预训练时序基础模型的极端天气海上
+
+风电功率预测
+
+李少锋 1，沈晓东 1，刘俊勇 1，范士雄 2
+（1. 四川大学电气工程学院，成都 610065；2. 中国电力科学研究院有限公司，北京 100192）
+摘 要：风电功率序列在极端天气下呈现强非平稳性与突变特性，且历史样本稀缺，导致传统深度学习方法难以 充分训练，预测精度显著下降。针对此问题，该文提出一种基于时序基础模型的台风两阶段自适应预测框架 (typhoon two-phase adaptive prediction model，TTPAPM)。首先，设计台风适配模块对输入序列进行周期成分与突 变扰动的分离表征，以强化模型对异常气象特征的感知能力；然后，将两类特征拼接融合后输入预训练时序基础 模型，实现小时量级的功率预测；最后，引入两阶段混合优化策略，通过对常规分布与台风分布的针对性校准， 有效修正极端天气导致的数据分布偏移。结果表明：1）所提方法有效解决了台风条件下样本稀缺导致的建模问题， 相较于基线最优模型，常规天气与台风天气的决定系数提升 10.5%与 3.5%；2）在零样本设置下，常规与台风天 气下的预测精度分别达到 0.85 与 0.71，仍能保持良好的可迁移性与预测稳定性；3）在计算资源方面，内存占用 显著低于基线模型，该研究可为时序基础模型在极端天气场景下的风电功率预测提供有效参考。 关键词：风电预测；台风天气；TTPAPM；零样本能力；时序基础模型
+Offshore Wind Power Forecasting Under Extreme Weather Based on Pre-trained Time-series Foundation Model
+LI Shaofeng1, SHEN Xiaodong1, LIU Junyong1, FAN Shixiong2
+(1. School of Electrical Engineering, Sichuan University, Chengdu 610065, China; 2. China Electric Power Research Institute, Beijing 100192, China)
+1
+Abstract：Wind power sequences under extreme weather conditions exhibit strong non-stationarity and abrupt variation characteristics. Meanwhile, the scarcity of historical samples makes it difficult for traditional deep learning methods to be fully trained, leading to a significant decline in prediction accuracy. To address this issue, this paper proposes a two-phase adaptive forecasting framework based on a pre-trained time-series foundation model, termed the Typhoon two-phase adaptive prediction model (TTPAPM). First, a typhoon adaptation module is designed to separately represent the periodic components and abrupt disturbance components of the input sequence, thereby enhancing the model’s perception capability for abnormal meteorological features. Then, the two types of features are concatenated and fused before being fed into the pre-trained time-series foundation model to achieve hourly-scale power prediction. Finally, a two-stage hybrid optimization strategy is introduced to effectively correct the data distribution shift caused by extreme weather through targeted calibration of both regular and typhoon distributions. The results show that: 1) The proposed method can be used to effectively solve the problems of the modeling difficulty caused by sample scarcity under typhoon conditions, and compared with the best baseline model, the coefficient of determination (R2) under regular weather and typhoon weather is improved by 10.5% and 3.5%, respectively; 2) Under the zero-shot setting, the prediction accuracy under regular and typhoon weather reaches 0.85 and 0.71, respectively, indicating good transfer ability and prediction stability; 3) In terms of computational resources, the memory consumption is significantly lower than that of the baseline models. This study can provide an effective reference for applying time-series foundation models to wind power prediction under extreme weather scenarios. Key words：wind power forecasting; typhoon weather; TTPAPM; zero-shot capability; time series foundation model
+
+———————
+基金资助项目：国家自然科学基金(52477113)。 Project supported by National Natural Science Foundation of China (52477113).
+
+李少锋，沈晓东，刘俊勇，等：基于预训练时序基础模型的极端天气海上风电功率预测
+
+3087
+
+0 引言
+在全球能源结构向可再生能源深度转型的进 程中，海上风电凭借其风速高、出力稳定、可开发 规模大、不占用陆地资源等优势，已成为我国新型 电力系统建设的核心支撑力量[1]。风电功率的精准 预测是电力系统优化运行的关键技术环节，直接关 系到电网调度计划制定、备用容量配置、电力市场 交易与风电场运维决策，对保障电力系统安全稳定 运行具有不可替代的作用[2]。
+与陆上风电相比，海上风电面临更复杂的气象 环境，尤其是台风等极端天气事件频发。台风过程 中，风速呈现强波动性、严重非平稳性与突发阶跃 特性，导致风电功率出现瞬时突变、剧烈爬坡等现 象，极易引发风电机组停机、脱网甚至设备损坏， 严重威胁电力系统的功率平衡与安全稳定[3]。同时， 台风事件属于小概率极端场景，可用的有效历史样 本极为稀缺，且存在严重的样本不平衡问题，给预 测模型的训练与泛化带来极大挑战[4]。因此，实现 台风等极端天气下海上风电功率的高精度预测，已 成为当前电力领域亟待解决的关键问题。
+传统风电功率预测方法主要分为统计建模、经 典机器学习与深度学习 3 大类。统计模型如 ARIMA[5]、GARCH[6]等能够刻画平稳时序的趋势与 波动特性，但难以应对风电序列中的强非线性与突 变 特 性 [7] 。 经 典 机 器 学 习 方 法 如 支 持 向 量 机 (SVM)[8]、随机森林(RF)[9]、梯度提升树(GBDT)[10] 等虽然提升了非线性建模能力，但在长序列依赖建 模、跨尺度动态适应方面存在明显不足[11]。随着深 度学习技术的发展，卷积神经网络(CNN)[12]、循环 神经网络(RNN)[13]、长短时记忆网络(LSTM)[14]、 Transformer 系列模型[15]等被广泛应用于风电预测， 能够有效挖掘复杂的时序模式，但在极端天气场景 下，受限于小样本约束，模型预测性能显著下降[16]， 同时存在计算开销大、易过拟合等问题。
+为缓解极端天气下小样本事件导致的风电功 率预测精度下降，文献[17]采用张量低秩补全方法 重构缺失观测数据，降低由数据缺失引起的估计偏 差；文献[18]构造“温度差”派生特征增强模型对 极端扰动的敏感性；文献[19]提出多种抽样策略以 矫正不同天气事件间的样本不平衡；文献[20]引入 TimeGAN 进行时间序列数据增强，提高了模型在极 端场景下的拟合能力。上述方法虽然能够缓解训练
+
+样本不足的问题，但传统数据增强方法难以有效保 持风电数据固有物理特性和时序依赖关系[21]；同 时，极端天气事件下的数值天气预报数据经常存在 预报偏差[22]，直接以此为基础进行样本扩充偏差较 大，生成数据的质量难以支撑高精度预测模型的训 练需求[23]。文献[24]采用迁移学习方法，将源域中 学习到的特征表示和预测知识迁移至目标域，减少 模型对目标域新增样本的依赖，以降低低质量样本 生成引入的偏差。然而，现有迁移学习方法多依赖 少量目标域样本进行微调，尚难以拓展至零样本预 测情形，限制了其他区域极端场景下的适用性。
+为突破上述瓶颈，学术界开始关注预训练时序 基础模型(time-series foundation models，TSFM)， TimeGPT 在多类未见数据集上展现了具有竞争力 的零样本预测表现[25]，Moirai-MoE 在大规模跨领域 预训练条件下，进一步增强了模型的零样本预测性 能[26]；同时，Chronos-2[27]、TimesFM[28]从模型结构 与推理范式上验证了其在时间序列预测中的可行 性。这类模型通过大规模预训练，展现出跨场景迁 移与零样本预测的潜力。尽管在极端天气下引入预 训练时序基础模型展现出巨大的潜力，但直接应用 仍面临关键挑战。首先，基础模型参数量庞大，训 练和推理的计算开销较高[29]；其次，由于极端天气 下风电功率具有强非平稳性，模型仍需针对性优化 以适应此类动态变化；最后，目标任务的分布特征 与训练样本差异显著，模型性能可能受到分布偏移 影响。
+面向台风天气下短期海上风电功率的预测任 务，本文提出一种基于时序基础模型 Lag-Llama 的 预测框架。该框架通过台风适配模块解耦周期模态 与突变扰动，并采用两阶段训练策略校准极端天气 引起的分布偏移，在样本稀缺条件下实现高精度功 率预测。
+1 TTPAPM 结构
+本文构建了基于时序基础模型的台风两阶段 自适应预测框架(typhoon two-phase adaptive prediction model，TTPAPM)，如图 1 所示。模型整体数据 流与工作流程如下所述。
+输入层：原始输入数据包括海上风电场历史风 电功率时序数据与数值天气预报(numerical weather prediction，NWP)，经数据预处理与滑动窗口展开 后，输入至后续特征提取模块。
+
+3088
+
+高电压技术
+
+2026, 52(7)
+
+图 1 TTPAPM 模型框架图 Fig.1 Framework of the TTPAPM model
+
+通 道 SE 模 块 ： 即 为 压 缩 激 励 模 块 (squeeze-and-excitation，SE)，通过对输入的多通道 气象特征进行通道权重自适应调整，自适应学习不 同气象变量对风电功率的贡献权重，突出关键特征、 抑制冗余信息与噪声，提升特征表征质量。
+台风适配模块：即为模型核心特征提取模块， 采用并行双支路架构，该双支路结构称为动态时序 融合模块(dynamic temporal fusion module，DTFM)： ① TCN 为 时 间 卷 积 网 络 (temporal convolutional network，TCN)，通过分块卷积与残差连接，捕捉 多尺度局部时序依赖与周期性波动特征；② HAVOK 为基于 Hankel 矩阵的动态分解方法(Hankel alternative view of Koopman，HAVOK)。该支路基于 动力系统理论，能够提取台风场景下风电功率序列 中的突发扰动与非平稳特征。两条支路的输出经特 征对齐后拼接融合，生成兼顾周期特性与突变特性 的融合时序嵌入。图 1 中，H 表示 Hankel 延迟嵌入 矩阵， xτ 表示时刻 τ 的风电功率观测值。
+融合投影层：将融合特征线性映射至 Lag-Llama 模型的输入特征空间，完成异构特征与 预训练骨干网络的维度匹配与空间对齐，避免特征 空间不匹配导致的信息损失。
+预训练 Lag-Llama 骨干网络：全程冻结网络参 数，基于输入的时序嵌入完成长序列依赖建模与通 用时序表征提取，输出高维隐藏状态特征。
+输出映射层：将 Lag-Llama 输出的高维隐藏状 态映射至风电功率预测目标维度，实现从抽象时序
+
+表征到具体物理量的转换，输出最终的风电功率预 测值。
+2 核心模块和算法实现
+2.1 Lag-Llama 模块 本文选取 Lag-Llama 模型作为时序表征骨干，
+基于以下任务约束与工程目标的匹配性。首先，台 风事件样本占比低且存在分布偏移，要求主干模型 具备少样本条件下的可迁移性[30]。Lag-Llama 在涵 盖能源、气象等 27 个领域，超过 5 000 个时序数据 集上完成了预训练，具备跨领域零样本与小样本泛 化能力[31]。其次，本文采用“冻结主干与台风适配 层”的范式，在此设定下，Lag-Llama 基于仅含解 码器的 Transformer 结构，具有较好的参数冻结与任 务适配能力。可有效规避极端天气小样本下全参数 微调导致的过拟合与显存开销问题。此外，如表 1 所示，相较于 TimeGPT、PatchTST、TimesNet 等主 流时序大模型，Lag-Llama 在开源性、预训练数据 覆盖度、概率预测能力、黑箱适配性等方面更适配 本文的研究场景需求，模型结构如附录 A 图 A1 所 示。 xτ 表示序列内部第 τ 个时间步的风电功率观测 值， cτ 表示第 τ 个时间步对应的协变量；M 表示 Transformer 解码层的堆叠层数。
+Lag-Llama 以“滞后项+时间特征”进行 token 化输入。具体地，在每个时刻 t 将历史观测值按预 设滞后索引集合构造 Lag 特征向量，并与日期时间 特征拼接形成 token，经共享线性投影映射至注意力
+
+李少锋，沈晓东，刘俊勇，等：基于预训练时序基础模型的极端天气海上风电功率预测
+
+3089
+
+隐空间，通过带因果掩码的多层解码器完成序列建 模。模型在每层采用预归一化与旋转位置编码以增 强长序列建模稳定性。设输入序列的上下文窗口长 度为 L，并给定对应的协变量序列，Lag-Llama 通过 学习目标序列的条件概率分布，将多步预测任务以 自回归方式分解为逐步预测概率的乘积形式。本文 仅将其视为表征提取器，通过固定 Lag-Llama 的全 部 Transformer 主干参数，取最后一层隐藏表征作 为输出映射的输入，以学习从通用时序表示到台风 条件下目标输出的校准映射。
+表 1 时序基础模型对比分析 Table 1 Comparative analysis of time-series foundation
+models
+
+项目
+
+Lag-Llama TimeGPT PatchTST TimesNet
+
+开源性
+
+完全开源
+
+闭源 API
+
+开源
+
+开源
+
+预训练数据 核心架构
+
+27 个领域， 12 个领域， 单一领域 单一领域
+5 000+数据集 1 000+数据集 仅解码器 仅解码器 编码器 2D 卷积+ Transformer Transformer Transformer Transformer
+
+概率预测能力
+
+支持
+
+支持
+
+不支持 不支持
+
+黑箱适配性
+
+优
+
+差
+
+中
+
+中
+
+本文场景 适配性
+
+最优，适配小样
+
+泛化能力不 泛化能力不
+
+无法与黑箱
+
+本、零样本极端
+
+足，无概率 足，无概率
+
+适配
+
+场景
+
+预测
+
+预测
+
+2.2 台风适配模块 针对台风场景的特殊性，直接应用 Lag-Llama
+仍存在明显不足：台风场景蕴含的强非线性动态特
+
+征在常规预训练数据中占比极低，难以被通用时序
+
+表征完全捕捉，直接预测会出现峰值跟踪偏差、突
+
+变滞后等问题。因此，本文设计专属的特征适配模
+
+块，在保留 Lag-Llama 长序列建模与泛化能力的同 时，实现对台风极端场景的精准适配。该模块采用
+
+并行双支路架构，以同时刻画台风天气下的局部突
+
+变与全局动态特征：时间卷积分支负责提取局部时
+
+序模式与周期性波动特征，动态分解分支则用于提
+
+取系统的突发扰动。
+
+在时间卷积分支中，将通道 SE 模块自适应校 准后的特征图切分为重叠块，经线性映射后通过一
+
+维卷积提取局部特征，并引入残差连接以缓解梯度
+
+消失。
+
+Et=cn Ea + Re LU(Conv(Ea ))
+
+(1)
+
+式中：Ea 为局部时序输入；Etcn 为卷积输出；Conv 为一维卷积； Re LU 为残差连接。
+
+在台风适配模块中，动态分解分支引入
+
+HAVOK 算法。该算法最初面向具有强非线性、间
+
+歇突变的时间序列，通过奇异值分解将复杂非线性
+
+系统分解为线性动力学与外力驱动的叠加形式[32]。
+
+从动力学角度分析，台风天气下的风电功率序列同
+
+样呈现显著的非平稳性与突发跃迁特征，其演化过
+
+程由平稳风速驱动的连续变化与阵风冲击等外部扰
+
+动共同构成，这与 HAVOK 所描述的外力驱动线性
+
+系统的机理高度契合。文献[33]结合 HAVOK 与机
+
+器学习，将混沌动力学分解为间歇外力驱动线性系
+
+统，在典型混沌时间序列预测中取得了更优的预测
+
+性能；文献[34]将非线性项视为外部强迫，用于高
+
+维非线性动力系统的时空预测。上述研究为本文将
+
+HAVOK 思想用于刻画常规波动与突发非平稳扰动
+
+并存的风电功率序列提供了方法和依据。
+
+具体而言，设输入风电功率序列为
+
+x = {x1, x2 ,…, xd } ，其中 d 表示输入序列长度。首先 采用滑动延迟嵌入方式构造 Hankel 矩阵，即：
+
+■ x1 x2 … xn ■
+
+H
+
+=
+
+| | |
+
+x2
+
+x3
+
+…
+
+xn+1
+
+| |
+
+|
+
+(2)
+
+|⋮ ⋮
+
+⋮|
+
+■ xm xm+1 … xm+n−1 ■
+
+式中：m 为嵌入维数；n 为时间片段数。该矩阵通
+
+过堆叠不同时间延迟下的观测值，将原始时序重构
+
+为具有时序关联结构的高维表示。随后，对 H 进行
+
+奇异值分解为：
+
+H = UΣV T
+
+(3)
+
+式中：U、V 分别表示左、右奇异向量矩阵； Σ 为
+
+奇异值对角矩阵。通过保留前 r 个主导模态，可在
+
+降噪的同时提取系统的主要动力学信息。将前 r–1
+
+个主模态对应的低维表示作为系统的内在状态变
+
+量，将第 r 个模态视为外部强迫项，从而把复杂非
+
+线性系统写成近似线性系统与外力驱动的形式，即：
+
+zk+1 = A ⋅ zk + B ⋅ Fk
+
+(4)
+
+式中：zk 为第 k 个延迟嵌入片段对应的低维状态向
+
+量，刻画功率序列的周期性与缓变成分； Fk 为第 k
+
+个时间片段对应的外部强迫项，表征台风引发的突
+
+发非平稳冲击；A 和 B 分别为状态转移矩阵和输入
+
+矩阵。为构建该分支的完整特征表示，将 zk 与 Fk 在 特征维度进行拼接，得到原始动态嵌入 Eb ，再通过 线性映射将其投影到与时间卷积分支相同的维度，
+
+得到最终动态嵌入为：
+
+Eb = [zk ; Fk ]
+
+(5)
+
+3090
+
+高电压技术
+
+2026, 52(7)
+
+Ehavok =EbΤ ⋅Whavok + bhavok
+
+(6)
+
+式中：Whavok 和 bhavok 分别为全连接层的权重矩阵和 偏置向量。该分支输出的 Ehavok 聚焦于时间序列中 的跃迁过程与外力驱动特征，可有效弥补时间卷积
+
+分支在捕捉此类全局动态信息方面的不足。
+
+2.3 特征融合与维度变换
+
+为将异构嵌入输入到预训练 Lag-Llama 主干，
+
+将卷积输出 Etcn 与动态嵌入 Ehavok 在通道维度拼 接，经线性投影映射到 Lag-Llama 所需的输入维度
+
+dm ，得到融合特征 Efused ，即：
+
+[ ] = Ec Etcn ; Ehavok ∈ R2×dm
+
+(7)
+
+Efused =
+
+LN( Ec
+
+⋅
+
+WT concat
+
++
+
+bconcat ) ∈ Rdm
+
+(8)
+
+式中： Ec 为拼接特征； Wconcat 和 bconcat 分别为融合 层的权重矩阵和偏置向量；LN 表示层归一化操作。
+
+融合特征 Efused 输入到 Lag-Llama 模型后，得到的高 维隐藏输出经输出映射层得到目标维度的预测结果。
+
+3 优化方法
+
+针对预训练 Lag-Llama 模型的黑箱约束(无法 访问内部权重与梯度)，以及台风场景小样本与样本 不平衡的特点，本文设计两阶段混合优化训练策略， 在冻结骨干网络的条件下实现参数高效训练，从而 避免全参数微调的灾难性遗忘与负迁移问题。整体 训练流程如图 2 所示。
+
+图 2 TTPAPM 训练方法 Fig.2 Training methodology of TTPAPM
+
+设 t 为目标预测样本索引，用于预测该样本风
+
+电 功 率 的 多 变 量 输 入 序 列 记 为 Xt 。 本 文 将
+
+Lag-Llama 作为冻结主干 fθ 以提供稳健的序列建模 能力，并在其输入侧引入通道单元 cϕ 与台风适配模
+
+块 gφ ，模块输出经投影对齐 Pψ (·) 后输入 fθ ，最终
+
+由输出映射 hω 产生预测结果：
+
+( ( )) ( ) yˆt = hω fθ Pψ gφ (cϕ (Xt ))
+
+(9)
+
+3.1 阶段一：常规场景通用能力训练
+
+本阶段在大规模常规天气数据集上完成模型
+
+训练，目标是让适配层学习通用的风电功率时序特
+
+征与风速功率映射关系，建立模型的基础泛化能力。
+
+训练过程中全程冻结 Lag-Llama 骨干网络的所有参
+
+数，仅对外接适配层模块进行优化。由于无法获取
+
+Lag-Llama 内部的梯度信息，其输入侧的台风适配
+
+等模块无法使用一阶优化方法，因此采用随机梯度
+
+估计器(random gradient estimator, RGE)进行零阶优
+
+化。而输出映射层为参数规模小且梯度易于获取，
+
+直接使用 Adam 优化器就能够实现快速收敛。由此
+
+形成输入侧零阶优化与输出侧一阶优化的混合优化
+
+范式。零阶优化通过有限差分近似梯度，具体实现
+
+步骤如下：
+
+初始化参数：令 Θ = { cϕ ， gφ ， Pψ (·) }表示输 入端模块的参数。采用 Xavier Uniform 初始化，偏
+
+置初始化为零。对这些参数采用 RGE 方法，通过 q
+
+次 随 机 方 向 ui 的 有 限 差 分 查 询 计 算 估 计 梯 度 ∇L(Θ) ，计算式如下：
+
+∑ ∇L(Θ)
+
+= 1 q L(Θ q i=1
+
++
+
+µ ui
+
+) − L(Θ 2µ
+
+−
+
+µ ui
+
+)
+
+ui
+
+(10)
+
+式中：q 为查询次数；2μ 为随机扰动步长； ui 为随 机采样方向， L(Θ + µui ) 和 L(Θ − µui ) 分别对输入 侧参数施加正、负扰动时，损失函数 L(Θ) 在不同扰
+
+动方向上的损失值。参数更新采用梯度下降：
+
+Θi+=1 Θi −η L(Θi )
+
+(11)
+
+式中：i 为优化迭代索引；η 为参数更新步长。
+
+3.2 阶段二：台风场景自适应微调
+
+本阶段在有限台风样本数据集上进行模型微
+
+调，目标是在保留骨干网络通用时序表征能力的同
+
+时，使模型自适应台风场景的极端动态特性，精准
+
+捕捉功率突变与峰值波动。微调过程中，仅更新台
+
+风适配模块 gφ 与输出映射层 hω ，其余参数完全冻 结。优化策略延续阶段一的混合范式：台风适配模
+
+块采用零阶优化，输出映射层采用一阶优化。
+
+李少锋，沈晓东，刘俊勇，等：基于预训练时序基础模型的极端天气海上风电功率预测
+
+3091
+
+针对台风样本稀缺及类别严重不平衡问题，设
+
+计突变样本加权损失函数，对台风时段的功率突变
+
+样本赋予更高权重，强化模型对极端事件的捕捉能
+
+力。模型预测值为 yˆt ，观测值为 yt ，基础损失为
+
+l( yˆt , yt ) ，则加权经验风险定义 L 为：
+
+∑ =L
+
+|
+
+1 Ω
+
+|
+
+t∈Ω
+
+w
+
+⋅ l(
+
+yˆt ,
+
+yt
+
+)
+
+(12)
+
+式中：Ω 为训练样本索引集合；w 为样本权重。
+
+同时，仅优化台风加权损失可能导致模型参数
+
+过度偏离阶段一学到的最优区域，引发灾难性遗忘。
+
+为此，阶段二引入权重保持正则项，通过对台风适
+
+配模块和输出映射层参数的更新幅度施加约束，限
+
+制其偏离阶段一最优解的程度。阶段二的总体损失
+
+函数 Ltotal 为：
+
+Ltotal= L + λ ⋅ Π(Θ)
+
+(13)
+
+式中：Π(Θ) 为权重保持正则项；λ 为平衡系数，在
+
+提升台风域预测精度的同时，防止模型对常规域产
+
+生灾难性遗忘。
+
+为明确台风样本的判定标准，依据中国科学院 海洋科学数据中心整合的中国近海台风路径数据 集，当台风中心与风电场之间的距离小于 300 km 时，即认为该风电场受到台风影响[35]。结果表明， 两类天气条件下功率分布的最大累积分布差异达到 0.358 8，证实台风过程引发了显著的分布偏移。图 3(a)的箱线图进一步显示，台风期间功率出现明显 偏移。这一分布偏移意味着，模型在常规样本上学 习到的功率映射关系难以直接迁移至台风窗口。图 3(b)的样本统计则表明，台风事件在全样本中占比 仅 3.56%，属于典型的小样本场景。样本的极度稀 缺使得常规端到端训练方法易被大量非台风样本主 导，导致模型对台风时段的拟合与校准不足。因此， 有必要通过台风样本微调对模型进行针对性校准。
+
+4 实验结果
+
+本文以第五届“金风杯”能源创新挑战赛决赛
+
+官方提供的数据集进行分析，验证所提预测模型的
+
+有效性。数据集涵盖 2021 年 1 月 1 日到 2022 年 12
+
+月 31 日期间多个独立风电场的数据，包含风电功率
+
+及风速、风向、气压等多维气象变量，时间分辨率
+
+为 15 min，每个风电场约含 7×104 个时序数据点。
+
+为保证实验的合理性，按时间顺序将数据划分为训
+
+练集与测试集，比例为 8:2。实验以 100 个时间步
+
+作为预测窗口，以平均绝对误差(mean absolute error, εMAE )、均方根误差(root mean square error, εRMSE ) 和决定系数(coefficient of determination，ε R2 )作为模 型预测精度的主要评价指标。即：
+
+∑ ε= MAE
+
+1 N
+
+N t =1
+
+yt
+
+− yˆt
+
+×100%
+
+(14)
+
+ε R= MSE
+
+∑ 1
+N
+
+N
+( yt
+t =1
+
+−
+
+yˆt )2
+
+×100%
+
+(15)
+
+∑ ∑ = ε R2 = 1 − ■|■ tN1
+
+N
+( yt − yˆt )2 /
+=t 1
+
+(
+
+yt
+
+−
+
+y)2
+
+■ | ■
+
+(16)
+
+式中：N 为测试样本数量； y 为所有时段实际观测
+
+功率的平均值。
+
+为定量刻画台风与常规天气下风电功率的分
+
+布偏移特性与小样本程度，对两类样本的功率边缘
+
+分布进行 KS 检验。
+
+图 3 台风与常规天气下风电功率特性对比图 Fig.3 Comparison of wind power characteristics under ty-
+phoon and normal weather conditions
+4.1 常规天气预测性能分析 为验证所提方法在常规天气场景下的风电功
+率预测性能，本研究选取海上风电场(站点 0)作为独
+
+3092
+
+高电压技术
+
+2026, 52(7)
+
+立测试集，以 Informer、Transformer、Autoformer 及 FEDformer 等主流时序预测模型作为对比基准。 上述模型均采用相同的数据划分、输入窗口、预测 步长及评价指标，以保证基础对比实验的公平性。 图4 展示了各模型在常规天气下的风电功率预测结果。
+
+适应性，在保持与常规天气实验完全相同的模型配 置基础上，本节聚焦台风场景下的预测性能对比， 结果如图 5 和表 2 所示。
+
+图 4 常规天气下 TTPAPM 与主流时序预测模型 预测结果对比
+Fig.4 Prediction comparison between TTPAPM and mainstream time-series forecasting models under normal weather
+conditions
+
+从表 2 可知，在常规天气条件下，TTPAPM 取 得了最优的预测精度，相较于表现次优的 Informer 模型，εMAE 降低了 0.25 个百分点，εRMSE 降低了 0.66 个 百 分 点 ， ε R2 提 升 了 0.09 ； 而 与 表 现 最 弱 的 Autoformer 相比，其 εMAE 与 εRMSE 降幅约达 50%，ε R2 提升 0.15。结果表明，TTPAPM 在常规天气下具备 稳定的基准预测能力，为后续台风场景适配奠定了
+良好基础。
+
+表 2 5 种模型下的海上风电功率预测评价指标
+
+Table 2 Evaluation metrics of offshore wind power prediction
+
+under five models
+
+天气类型
+
+模型设置
+
+εMAE/%
+
+εRMSE/%
+
+ε R2
+
+TTPAPM
+
+0.55
+
+0.87
+
+0.95
+
+Transformer
+
+0.87
+
+1.58
+
+0.85
+
+常规天气
+
+Informer
+
+0.80
+
+1.53
+
+0.86
+
+FEDformer
+
+0.91
+
+1.75
+
+0.82
+
+Autoformer
+
+1.12
+
+1.83
+
+0.80
+
+TTPAPM
+
+0.89
+
+1.32
+
+0.89
+
+Transformer
+
+1.10
+
+1.32
+
+0.85
+
+台风天气
+
+Informer
+
+1.14
+
+1.66
+
+0.84
+
+FEDformer
+
+1.13
+
+1.55
+
+0.86
+
+Autoformer
+
+1.98
+
+2.85
+
+0.51
+
+4.2 台风极端天气预测性能 为进一步评估所提方法在极端气象条件下的
+
+图 5 台风天气下 TTPAPM 与主流时序预测模型 预测结果对比
+Fig.5 Prediction comparison between TTPAPM and mainstream time-series forecasting models under typhoon conditions
+在台风天气条件下，TTPAPM 仍保持最优性能， 其中 εRMSE 与 Transformer 并列最低，εRMSE 与 ε R2 均 优于所有基线。值得注意的是，Autoformer 在台风 条件下预测效果下降最为显著， ε R2 由常规的 0.80 骤降至 0.51。从图 5 的预测曲线可以看出：在极端 波峰和波谷区间，TTPAPM 对真实功率峰值的跟踪 更为准确，而 Transformer、FEDformer 和 Informer 出现不同程度的高估或低估，Autoformer 则呈现明 显的锯齿状波动，与真实功率的变化趋势严重不符； 在平缓波动区间，TTPAPM 基本落在实际波动带内， 而 Informer 伴随明显滞后，Autoformer 同样出现振 荡。这表明所提方法对突变与噪声扰动具有更强的 鲁棒性，能够更稳定地追踪台风天气下的功率动态 变化。
+需要说明的是，本文进一步引入了 DLinear、 PatchTST、TimesNet 及 Chronos 模型作为台风天气 功率预测补充实验，其中 Chronos 作为预训练时序 基础模型用于评估大模型对比效果，各基线模型均 采用其原始训练方式，结果如图 6 和表 3 所示。
+从全序列预测结果来看，DLinear、PatchTST、 TimesNet 及 Chronos 模型均能基本捕捉风电功率的 整体变化趋势，但在功率骤降、低谷及局部峰谷波 动区间仍存在明显偏差。DLinear 依赖线性映射刻 画历史序列与未来功率的关系，在整体趋势刻画方 面具有一定稳定性，但对快速非线性变化的响应不 足，导致突变过程滞后；PatchTST 通过 patch 划分， 将突变信息分割至离散片段，易在低功率区间产生
+
+李少锋，沈晓东，刘俊勇，等：基于预训练时序基础模型的极端天气海上风电功率预测
+
+3093
+
+高估并在局部峰值出现过冲，其 εMAE 为 1.09%，为 几类补充模型中误差相对较大的模型；TimesNet 通 过时频卷积捕捉周期性与多尺度变化，能较好跟踪 总体趋势，且 εMAE 为 0.99%，但对非周期突变刻画 有限，中低功率区间波动偏差较大；Chronos 作为 预训练大模型，在相对平稳阶段表现较好， ε R2 达 到 0.86，体现出一定泛化能力，但由于缺少针对台 风突变过程的场景适配机制，在功率突降阶段存在 相位滞后，并在低功率区间表现出系统性高估。
+图 6 台风天气下 TTPAPM 与先进时序预测模型 预测结果对比
+Fig.6 Prediction comparison between TTPAPM and advanced time-series under typhoon conditions
+
+海上风电场测试样本对应的连续时间窗口作为目标 域测试集，直接利用在海上风电数据集上训练得到 的模型进行预测。在该过程中，未使用任何丘陵风 电场(站点 1)数据进行再训练或微调，模型参数保持 固定，仅进行前向推理计算。该实验设置旨在评估 模型在不同地形与数据分布条件下的无监督泛化能 力。为保证实验的可比性，首先对海上与丘陵两类 风电场开展风速与风电功率之间的相关性分析，见 附录 A 图 A2。
+相关性分析表明，海上与丘陵风电场的风速功 率关系呈现一定差异，两类场景均表现出典型的 S 形功率曲线特征，但海上风电场的风速分布区间更 宽，且在中高风速段功率输出趋于饱和；而丘陵风 电场则在较低风速段就出现明显的非线性波动，表 明在台风条件下二者线性关联有限。
+图 7 分别给出了模型在丘陵风电场常规天气与 台风天气下的零样本预测结果。由表 4 可知，在常 规天气条件下，模型各项评价指标为 εMAE=1.24%、
+
+表 3 台风天气下补充模型预测性能对比
+
+Table 3 Performance comparison of supplementary forecast-
+
+ing models under typhoon conditions
+
+模型设置
+
+εMAE/%
+
+εRMSE/%
+
+ε R2
+
+TTPAPM
+
+0.89
+
+1.32
+
+0.89
+
+DLinear
+
+1.04
+
+1.52
+
+0.86
+
+TimesNet
+
+0.99
+
+1.40
+
+0.87
+
+PatchTST
+
+1.09
+
+Chronos
+
+1.08
+
+1.58
+
+0.85
+
+1.46
+
+0.86
+
+相比之下，TTPAPM 模型在功率突变及局部波 动过程中均表现出更强的动态响应能力，能够更准 确地跟踪功率骤降、回升以及峰谷变化。上述结果 表明，尽管现有先进模型和时序基础模型具备一定 趋势建模能力，但在台风等极端天气引发的强非平 稳、小样本场景下仍存在局限。本文方法通过针对 性特征建模与分布校准机制，有效提升了模型在复 杂动态环境中的预测精度与稳定性。 4.3 零样本能力验证
+为评估模型跨场景条件下的泛化能力，进一步 设计了跨风电场迁移实验。具体而言，研究选取与
+
+图 7 丘陵风电场零样本预测结果 Fig.7 Zero-shot forecasting results for the hilly wind farm
+
+表 4 零样本预测结果
+
+Table 4 Zero-shot forecasting results
+
+天气类型
+
+ε MAE /%
+
+ε RMSE /%
+
+ε R2
+
+常规天气
+
+1.24
+
+1.45
+
+0.85
+
+台风天气
+
+0.32
+
+0.68
+
+0.71
+
+3094
+
+高电压技术
+
+2026, 52(7)
+
+εRMSE=1.45%，ε R2 =0.85，误差维持在较低水平，表 明在缺乏目标监督的条件下，模型能够准确捕捉功 率的动态特征与幅值变化，展现出良好的跨域泛化 能力。与海上风电场相比，受丘陵地形粗糙度与湍 流影响，模型在台风天气下的跨场景泛化性能出现 一定衰减，但关键误差指标仍控制在相对较低的范 围，说明模型在跨地形零样本设定下仍保持一定精 度，具备应对场景差异的自适应能力。 4.4 消融实验
+为验证各模块在整体框架中的作用，本节在保 持训练数据、优化策略一致的前提下,设计两组模块 级消融实验，具体方案如下。
+1）台风适配模块(DTFM)消融。以完整 TTPAPM 为基线，设置两种削弱方案：(i)-DTFM：以轻量化 卷积层替代 DTFM，其余结构不变；(ii)NT-DTFM： 保留 DTFM 结构但冻结其参数更新，实验结果如下。
+由图 8 和表 5 可见，实验(i)的预测曲线过度平 滑，难以准确捕捉功率的快速升降过程，表明轻量 化卷积对高频扰动与非平稳成分的刻画能力有限。 实验(ii)的预测结果整体偏离真实值，且存在明显相 位滞后，说明冻结参数后模型无法有效提取台风场 景下的动力学特征。结果表明，台风适配模块多尺 度结构化表征与动力学分解机制有效降低峰谷处的 预测偏差，增强了模型对极端天气的适应性。
+2）对通道 SE 模块与输出映射层进行 3 组消融： (iii)no-channelse：完全移除通道 SE 模块，其他模块 可训练；(iv)NT-channelse：保留通道 SE 结构但冻 结参数，不参与训练；(v)no-out_projection：禁用输 出映射层，以单层线性头替代。
+由图 9 和表 5 可知，实验(iii)虽能定位峰值位 置，但出现过冲与抖动，误差显著增大，反映通道 级重要性筛选缺失导致冗余信息干扰下游模块。实 验(iv)能够跟随总体趋势但幅值系统性偏低，在台风 段出现预测曲线趋于平缓、无法跟随波动的现象， 并伴随相位偏移，说明冻结的通道重标定无法自适 应放大关键通道，导致峰值响应受限；实验(v)在起 始峰值段存在滞后与欠估，谷底阶段振幅校准能力 不足，表明输出映射层是将高维时序表征解码为功 率预测的关键组件，移除后将导致幅值失真与相位 漂移。 4.5 效率分析实验
+在统一的数据与流程下，对 TTPAPM 以及 4 个
+
+Transformer 系列基线模型在离线训练与在线测试 阶段的显存开销与时间成本进行系统评估，评估结 果见表 6。所有实验均在同一环境下完成：单卡 NVIDIA GeForce RTX 4060 Ti，PyTorch 2.6.0+cu126， TTPAPM 仅统计用户侧开销，不计入预训练大模型 的显存需求与训练时间。
+
+图 8 DTFM 模块消融实验结果 Fig.8 Ablation results of DTFM module
+
+表 5 消融实验评价指标对比
+
+Table 5 Comparison of evaluation metrics in ablation
+
+experiments
+
+天气类型
+
+模型设置
+
+εMAE/%
+
+εRMSE/%
+
+ε R2
+
+TTPAPM
+
+0.55
+
+0.87
+
+0.95
+
+i
+
+2.35
+
+3.27
+
+0.35
+
+ii
+
+2.77
+
+3.02
+
+0.47
+
+常规天气
+
+iii
+
+2.67
+
+3.53
+
+0.28
+
+iv
+
+3.12
+
+4.14
+
+0.01
+
+v
+
+2.55
+
+3.61
+
+0.25
+
+TTPAPM
+
+0.89
+
+1.32
+
+0.89
+
+i
+
+1.72
+
+2.06
+
+0.75
+
+ii
+
+1.83
+
+2.20
+
+0.72
+
+台风天气
+
+iii
+
+2.68
+
+3.99
+
+0.09
+
+iv
+
+2.10
+
+2.72
+
+0.57
+
+v
+
+1.50
+
+1.82
+
+0.81
+
+李少锋，沈晓东，刘俊勇，等：基于预训练时序基础模型的极端天气海上风电功率预测
+
+3095
+
+图 9 通道模块与输出映射层消融实验结果 Fig.9 Ablation results of channel module and output
+projection layer
+
+表 6 效率实验对比结果
+
+Table 6 Comparison results of efficiency experiments
+
+海上风电场
+
+训练阶段 内存/GB 时间/s
+
+测试阶段 内存/GB 时间/s
+
+TTPAPM
+
+0.09
+
+1 838.17
+
+0.04
+
+13.42
+
+Autoformer
+
+0.97
+
+1 860.59
+
+0.93
+
+3.59
+
+FEDformer
+
+0.89
+
+2 018.05
+
+0.91
+
+3.34
+
+Informer
+
+0.93
+
+936.10
+
+0.94
+
+2.29
+
+Transformer
+
+1.27
+
+606.7
+
+0.91
+
+1.04
+
+在计算时间方面，TTPAPM 的离线训练时间为 1 838.17 s ， 与 Autoformer 可 比 ， 明 显 短 于 FEDformer，但长于参数规模更小的 Informer 与 Transformer。在线测试阶段，TTPAPM 相较于基线 Transformer 模型更为耗时。无论是离线训练阶段还 是实时测试阶段，TTPAPM 的显存占用均低于基线 Transformer 模型。结果表明，在保证训练稳定性的 前提下，TTPAPM 以显存低的代价换取了可接受的 训练时长，印证了所提框架在训练效率上的优势。
+5 结论
+为解决台风等极端天气下样本稀缺与分布偏 移导致风电功率预测精度下降的问题，本文提出基
+
+于预训练时序基础模型的两阶段预测框架，并通过 对比实验与消融实验验证其有效性，主要结论如下：
+1）针对台风引起的跨气象条件迁移偏差，设 计“任务级预训练与事件级校准”的两阶段训练策 略，并结合代价敏感学习，有效缓解了常规与台风 天气之间的分布漂移，实现跨气象条件的平滑迁移 与稳定预测。
+2）以丘陵风电场作为外部数据集，在无目标 域监督条件下进行预测。结果表明，模型在常规天 气 下 保 持 较 低 误 差 (εMAE=1.24% ， εRMSE=1.45% ， ε R2 = 0.85)，在台风天气下仍能有效捕捉功率动态特 征(εMAE=0.32%，εRMSE=0.68%，ε R2 = 0.71)，展现出 良好的跨域迁移能力。
+3）对比实验表明，所提方法在常规与台风天 气下的预测精度均优于 Informer、Transformer 等基 线模型，尤其在峰值与突变区间能够更准确地跟踪 功率动态；消融结果进一步验证了台风适配模块等 关键组件对性能提升的显著贡献。
+本文方法适用于分钟级采样、小时量级预测的 工程场景，尤其适合目标事件样本占比低且存在显 著分布偏移的任务。所提冻结基础模型与外接适配 层的模块化架构具有良好的可扩展性：当基础模型 版本更替时，仅需对外接适配层重新训练或微调， 即可对齐新的表征空间，无需重构整体框架。当前 研究主要在单场站时序预测层面验证方法有效性， 尚未开展多风电场时空联合预测。后续将在获得更 完备的多场站观测数据后，引入空间相关性建模以 提升区域尺度极端天气下的泛化能力；同时探索多 模态数据融合与物理机理约束，增强模型在多样极 端场景下的稳健性与可解释性。
+附录见本刊网络版(http://hve.epri.sgcc.com.cn)。
+参考文献 References
+[1] 鲁宗相，黄瀚，单葆国，等. 高比例可再生能源电力系统的结构演 化与功率平衡[J]. 电力系统自动化，2021，45(12)：1-10. LU Zongxiang, HUANG Han, SHAN Baoguo, et al. Structural evolution and power balance of high-proportion renewable energy power systems[J]. Automation of Electric Power Systems, 2021, 45(12): 1-10.
+[2] 叶林，裴铭，李卓，等. 风电和光伏发电功率联合预测与预调度框 架[J]. 高电压技术，2024，50(9)：3823-3836. YE Lin, PEI Ming, LI Zhuo, et al. Framework for joint wind and photovoltaic power forecasting and pre-dispatch[J]. High Voltage Engineering, 2024, 50(9): 3823-3836.
+[3] 张元赫，杨明，于一潇，等. 台风天气下考虑可用装机容量不确定 性的短 期风电功率预测 方法[J]. 高电压技 术，2025 ，51(9) ：
+
+3096
+
+高电压技术
+
+2026, 52(7)
+
+4869-4879. ZHANG Yuanhe, YANG Ming, YU Yixiao, et al. Short-term wind power forecasting considering uncertainty of available installed capacity under typhoon weather[J]. High Voltage Engineering, 2025, 51(9): 4869-4879. [4] 阮前途，叶荣. 保障极端天气下供需安全的新型电力系统电源规划 [J]. 电力系统自动化，2025，49(4)：103-115. RUAN Qiantu, YE Rong. Power supply planning for new-type power systems to ensure supply–demand security under extreme weather[J]. Automation of Electric Power Systems, 2025, 49(4): 103-115. [5] 刘吉雄，邹瑞，许思为. 基于 ARIMA 的风电发电量预测[J]. 现代 信息科技，2025，9(4)：157-161，166. LIU Jixiong, ZOU Rui, XU Siwei. Wind power generation forecasting based on ARIMA[J]. Modern Information Technology, 2025, 9(4): 157-161, 166. [6] 马欣，吴涵，苗安康，等. 基于 DCC-GARCH 的海上风电场出力 空间相关性分析及预测[J]. 电力自动化设备，2023，43(6)：116-123. MA Xin, WU Han, MIAO Ankang, et al. Spatial correlation analysis and forecasting of offshore wind farm power output based on DCC-GARCH[J]. Electric Power Automation Equipment, 2023, 43(6): 116-123. [7] 赵泽妮，云斯宁，贾凌云，等. 基于统计模型的短期风能预测方法 研究进展[J]. 太阳能学报，2022，43(11)：224-234. ZHAO Zeni, YUN Sining, JIA Lingyun, et al. Progress in short-term wind energy forecasting methods based on statistical models[J]. Acta Energiae Solaris Sinica, 2022, 43(11): 224-234. [8] 马妍. 基于混沌遍历 PSO 的 LS-SVM 风电超短期功率预测研究[J]. 微型电脑应用，2024，40(5)：179-182，200. MA Yan. Ultra-short-term wind power forecasting based on LS-SVM optimized by chaotic ergodic PSO[J]. Microcomputer Applications, 2024, 40(5): 179-182, 200. [9] 李俊卿，李秋佳，石天宇，等. 基于随机森林重要性的 LSTM 网络 风电功率缺失数据补齐[J]. 电器与能效管理技术，2018，(13)： 47-52，58. LI Junqing, LI Qiujia, SHI Tianyu, et al. Imputation of missing wind power data using LSTM network guided by random-forest feature importance[J]. Electrical Equipment and Energy Efficiency Management Technology, 2018, (13): 47-52, 58. [10] 郑伟宏，朱峰刚，王小娟，等. 基于 PCA-Adaboost-GBDT 的短期 风电功率预测[J]. 电气自动化，2024，46(4)：80-83. ZHENG Weihong, ZHU Fenggang, WANG Xiaojuan, et al. Short-term wind power forecasting based on PCA-Adaboost-GBDT[J]. Electrical Automation, 2024, 46(4): 80-83. [11] 李特，黄孜滢. 机器学习在风力发电功率预测中应用综述[J]. 山东 电力技术，2025，52(8)：45-55. LI Te, HUANG Ziying. A review of machine learning applications in wind-power forecasting[J]. Shandong Electric Power Technology, 2025, 52(8): 45-55. [12] 薛阳，王琳，王舒，等. 一种结合 CNN 和 GRU 网络的超短期风 电预测模型[J]. 可再生能源，2019，37(3)：456-462. XUE Yang, WANG Lin, WANG Shu, et al. An ultra-short-term wind power forecasting model combining CNN and GRU[J]. Renewable Energy Resources, 2019, 37(3): 456-462. [13] 宋瑞宵. 基于改进 RNN 的风电功率短期预测算法研究[D]. 北京： 华北电力大学(北京)，2019. SONG Ruixiao. Research on short-term wind power forecasting algorithm based on improved RNN[D]. Beijing, China: North China Electric Power University (Beijing), 2019. [14] 张胜杰，张雪锋，谢忠洲，等. 基于 LSTM 的风电功率预测方法研
+
+究[J]. 能源与节能，2024，(8)：11-13. ZHANG Shengjie, ZHANG Xuefeng, XIE Zhongzhou, et al. Research on wind power forecasting based on LSTM[J]. Energy and Energy Conservation, 2024, (8): 11-13. [15] 刘谭，刘娜，刘贵平，等. 深度学习方法在风电功率预测中的应用 与研究方向概述[J]. 计算机科学与探索，2025，19(3)：602-622. LIU Tan, LIU Na, LIU Guiping, et al. Applications and research directions of deep learning methods in wind-power forecasting[J]. Journal of Frontiers of Computer Science and Technology, 2025, 19(3): 602-622. [16] 郑颖颖，李鑫，陈延旭，等. 基于 Stacking 多模型融合的极端天气 短期风电功率预测方法[J]. 高电压技术，2024，50(9)：3871-3882. ZHENG Yingying, LI Xin, CHEN Yanxu, et al. Short-term wind power forecasting method for extreme weather based on Stacking multi-model fusion[J]. High Voltage Engineering, 2024, 50(9): 3871-3882.. [17] 许青，丁坤，徐铭，等. 基于张量补全算法的极端天气短期风力光伏发电功率联合预测[J]. 兰州大学学报(自然科学版)，2025， 61(3)：350-356. XU Qing, DING Kun, XU Ming, et al. Short-term joint forecasting of wind-photovoltaic power under extreme weather based on tensor completion[J]. Journal of Lanzhou University (Natural Sciences), 2025, 61(3): 350-356. [18] 刘善峰，李哲，陈锦鹏，等. 基于误差修正的极端天气下风速预测 [J]. 南京信息工程大学学报(自然科学版)，2023，15(5)：574-584. LIU Shanfeng, LI Zhe, CHEN Jinpeng, et al. Wind-speed forecasting under extreme weather based on error correction[J]. Journal of Nanjing University of Information Science & Technology (Natural Science Edition), 2023, 15(5): 574-584. [19] DEBNATH A, WAGHMARE G V, WADHWA H, et al. Exploring generative data augmentation in multivariate time series forecasting: opportunities and challenges[C]//MileTS ’21: 7th KDD Workshop on Mining and Learning from Time Series. Singapore: ACM, 2021: 1-7. DOI: 10.1145/1122445.1122456. [20] 张玉敏，张津玮，吉兴全，等. 基于 TimeGAN 和 TCN-Informer 模型的极端大风天气下短期风电功率预测[J/OL]. 南方电网技术： 1-12[2025-09-10]. https://link.cnki.net/urlid/44.1643.TK.20250708.1016.002 ZHANG Yumin, ZHANG Jinwei, JI Xingquan, et al. Short-term wind-power forecasting under extreme gale based on TimeGAN and TCN-Informer[J/OL]. Southern Power System Technology: 1-12 [2025-09-10]. https://link.cnki.net/urlid/44.1643.TK.20250708.1016.002. [21] LIU R, SONG Y, CHEN Y, et al. Day-ahead power prediction of wind turbines under sudden weather via GAN-based data augmentation[J]. Energies, 2023, 16(21): 7250. [22] 冯双磊，王铮，王伟胜，等. 基于 CycleGAN 的区域风速网格化预 测方法[J]. 中国电机工程学报，2026，46(10)：4062-4075. FENG Shuanglei, WANG Zheng, WANG Weisheng, et al. Regional wind-speed gridded forecasting method based on CycleGAN[J]. Proceedings of the CSEE, 2026, 46(10): 4062-4075. [23] IWANA B K, UCHIDA S. An empirical survey of data augmentation for time series classification with neural networks[J]. PLOS ONE, 2021, 16(7): e0254841. [24] 李宇佳，陈富豪，阎洁，等. 基于迁移学习和自编码器的极端天气 自适应短期风电功率预测[J]. 电力系统自动化，2025，49(16)：85-95. LI Yujia, CHEN Fuhao, YAN Jie, et al. Adaptive short-term wind-power forecasting under extreme weather based on transfer learning and autoencoders[J]. Automation of Electric Power Systems, 2025, 49(16): 85-95. [25] 韦于思，金璐，高艳玲，等. 大模型及相关技术在用电需求分析预
+
+李少锋，沈晓东，刘俊勇，等：基于预训练时序基础模型的极端天气海上风电功率预测
+
+3097
+
+测领域的应用[J]. 电力信息与通信技术，2025，23(12)：89-100. WEI Yusi, JIN Lu, GAO Yanling, et al. Application of large models and related technologies in the field of electricity demand analysis and forecasting[J]. Electric Power Information and Communication Technology, 2025, 23(12): 89-100. [26] XU L, LIU J C , WOO G, et al. Moirai-MoE: Empowering time series foundation models with sparse mixture of experts[EB/OL]. arXiv: 2410.10469, 2024. [27] ANSARI A F, SHCHUR O, KÜKEN J, et al. Chronos-2: from univariate to universal forecasting[EB/OL]. arXiv Preprint, 2025: arXiv: 2510.15821. [28] DAS A, KONG W, SEN R, et al. A decoder-only foundation model for time-series forecasting[C]//Proceedings of the 41st International Conference on Machine Learning (ICML). Vienna, Austria: PMLR, 2024. [29] KOTTAPALLI S R K, HUBLI K, CHANDRASHEKHARA S, et, al. Foundation models for time series: a survey[EB/OL]. arXiv: 2504.04011, 2025. [30] 张祖菡，刘敦楠，凡航，等. 基于大语言模型的电力系统预测技术 研究综述[J]. 发电技术，2025，46(3)：438-453. ZHANG Zuhan, LIU Dunnan, FAN Hang, et al. A survey of prediction technologies in power systems based on large language models[J]. Power Generation Technology, 2025, 46(3): 438-453. [31] RASUL K, ASHOK A, WILLIAMS A R, et al. Lag-Llama: towards foundation models for probabilistic time series forecasting[EB/OL]. arXiv: 2310.08278, 2023. [32] BRUNTON S L, BRUNTON B W, PROCTOR J L, et al. Chaos as an intermittently forced linear system[J]. Nature Communications, 2017, 8: 19. [33] YANG J, ZHAO J, SONG J, et al. A hybrid method using havok analysis and machine learning for predicting chaotic time series[J].
+
+Entropy, 2022, 24(3): 408. [34] KHODKAR M A, HASSANZADEH P, ANTOULAS A, et al. A
+Koopman-based framework for forecasting the spatiotemporal evolution of chaotic dynamics with nonlinearities modeled as exogenous forcings[EB/OL]. arXiv preprint, 2019: arXiv: 1909.00076. [35] JIA B, SHEN Y, LIU X, et al. Typhoon-induced effects on wind power generation of a coastal wind farm based on wind observations[J]. Energy Science & Engineering, 2025, 14: 218-227.
+李少锋 2001—，男，硕士 研究方向为极端天气下的风电功率预测究工作 E-mail: 321197436@qq.com
+
+LI Shaofeng
+
+沈晓东(通信作者) 1975—，男，博士，副教授，博导 研究方向人工智能在电力系统中的应用 E-mail: shengxd@scu.edu.cn
+
+SHEN Xiaodong Ph.D.
+Associate professor Corresponding author
+收稿日期 2026-03-20 在线出版日期 2026-06-15 编辑 卫李静
+
+
